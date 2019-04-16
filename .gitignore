@@ -1,8 +1,6 @@
-<<<<<<< HEAD
-
 .idea/*
 __pycache__/*
-=======
 .idea/
+Spiritd_Away_frames/
+Spirited_Away_frames_smooth/
 Spirited_Away_frames/
->>>>>>> 01c9aeb49da6e6ce257bfd8eb58c7c2cc34a94cb
