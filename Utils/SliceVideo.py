@@ -2,8 +2,6 @@ import argparse
 import cv2
 from skimage.measure import compare_ssim as ssim
 from PIL import Image
-# import math
-# import numpy as np
 
 path_out = ''
 frame_count = 0
