@@ -3,6 +3,7 @@ from glob import glob
 from keras.models import Model
 from keras.layers import *
 from keras_contrib.layers.normalization import instancenormalization
+import tensorflow as tf
 
 
 class CartoonGAN(object):
@@ -10,12 +11,12 @@ class CartoonGAN(object):
         self.num_filters = num_filters
         self.model_name = 'CartoonGAN'
         self.dataset_name = dasetname
-        #
-        # self.trainA_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
-        # self.trainB_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB'))
-        # self.trainB_smooth_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB_smooth'))
-        #
-        # self.dataset_num = max(len(self.trainA_dataset), len(self.trainB_dataset))
+
+        self.trainA_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
+        self.trainB_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB'))
+        self.trainB_smooth_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB_smooth'))
+
+        self.dataset_num = max(len(self.trainA_dataset), len(self.trainB_dataset))
 
     def res_block(self):
         inp = Input(shape=(None, None, self.num_filters * 4))
@@ -92,3 +93,11 @@ class CartoonGAN(object):
         x = Conv2D(kernel_size=3, filters=1, strides=1, use_bias=False)(x)
 
         return Model(inp, x)
+
+    def sigmoid_cross_entropy_with_logistics(self,x , like_func):
+        return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=like_func(x),logits=x))
+
+
+    def discriminator(self,*factors):
+        return sum(map(self.sigmoid_cross_entropy_with_logistics, factors, [tf.ones_like, tf.zeros_like, tf.zeros_like]))
+
