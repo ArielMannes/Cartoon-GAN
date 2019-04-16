@@ -2,12 +2,7 @@
 
 paper -  http://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_Generative_Adversarial_CVPR_2018_paper.pdf
 
-<<<<<<< HEAD
-packeges : 
-	 tensorflow
-	 keras
-	 keras contrib : https://github.com/keras-team/keras-contrib
-=======
+
 ## Required Packages
 1. tensorflow
 2. keras
@@ -22,4 +17,4 @@ packeges :
 1. argparse
 2. urllib3
 3. math
->>>>>>> 01c9aeb49da6e6ce257bfd8eb58c7c2cc34a94cb
+
