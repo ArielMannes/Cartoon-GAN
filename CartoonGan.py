@@ -1,9 +1,9 @@
-from builtins import filter
 from glob import glob
 from keras.models import Model
 from keras.layers import *
 from keras_contrib.layers.normalization import instancenormalization
-import tensorflow as tf
+
+from Utils.Loss import sigmoid_cross_entropy_with_logits
 
 
 class CartoonGAN(object):
@@ -93,11 +93,3 @@ class CartoonGAN(object):
         x = Conv2D(kernel_size=3, filters=1, strides=1, use_bias=False)(x)
 
         return Model(inp, x)
-
-    def sigmoid_cross_entropy_with_logistics(self,x , like_func):
-        return tf.reduce_mean(tf.nn.sigmoid_cross_entropy_with_logits(labels=like_func(x),logits=x))
-
-
-    def discriminator(self,*factors):
-        return sum(map(self.sigmoid_cross_entropy_with_logistics, factors, [tf.ones_like, tf.zeros_like, tf.zeros_like]))
-
