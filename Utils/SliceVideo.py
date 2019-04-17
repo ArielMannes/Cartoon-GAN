@@ -1,7 +1,8 @@
 import argparse
+
 import cv2
-from skimage.measure import compare_ssim as ssim
 from PIL import Image
+from skimage.measure import compare_ssim as ssim
 
 path_out = ''
 frame_count = 0
@@ -12,8 +13,8 @@ def extract_images(path_in):
     vidcap = cv2.VideoCapture(path_in)
     success, last_image = vidcap.read()
     count = 0
-    while success: # and frame_count < 100:
-        vidcap.set(cv2.CAP_PROP_POS_MSEC, count * 100)
+    while success:  # and frame_count < 100:
+        vidcap.set(cv2.CAP_PROP_POS_MSEC, count * 100)  # Spirited Away 100
         success, image = vidcap.read()
         if image is None:
             break
@@ -25,7 +26,7 @@ def compare_and_save(imageA, imageB):
     global path_out, frame_count
     _ssim = ssim(imageA, imageB, multichannel=True)
     # _psnr = psnr(imageA, imageB)
-    if _ssim < 0.35:
+    if _ssim < 0.45:  # Spirited Away 0.45
         _image = Image.fromarray(imageB[:, :, ::-1], 'RGB')
         _image = _image.resize((256, 256), Image.ANTIALIAS)
         _image.save('{}/frame{}.jpg'.format(path_out, frame_count))
