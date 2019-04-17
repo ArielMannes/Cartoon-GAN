@@ -11,8 +11,10 @@ paper -  http://openaccess.thecvf.com/content_cvpr_2018/papers/Chen_CartoonGAN_G
 6. OpenCV: cv2
 7. scikit-image
 8. numpy
+9. tqdm
 
 ## Packages that we used
 1. argparse
 2. urllib3
 3. math
+4. glob
