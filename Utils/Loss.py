@@ -1,4 +1,6 @@
+import keras
 import tensorflow as tf
+
 
 
 def sigmoid_cross_entropy_with_logits(x, like_func):
@@ -14,7 +16,20 @@ def discriminator_loss(real, fake, real_blur):
 def generator_loss(fake):
     return sigmoid_cross_entropy_with_logits(fake, tf.ones_like)
 
+def L1_loss(x, y):
+    loss = tf.reduce_mean(tf.abs(x - y))
 
-def vgg_loss(real, fake):
-    # TODO: implement
-    return NotImplementedError
+    return loss
+
+
+
+def vgg_loss(real, fake, conv4_4):
+
+    real_features = conv4_4.evaluate(real)
+    fake_features = conv4_4.evaluate(fake)
+
+    return L1_loss(real_features, fake_features)
+
+
+
+vgg_loss(None, None)
