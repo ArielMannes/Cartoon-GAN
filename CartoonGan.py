@@ -1,4 +1,3 @@
-from glob import glob
 import Utils.vgg_loss_model as loss_model
 from keras.models import Model
 from keras.layers import *
@@ -13,17 +12,10 @@ class CartoonGAN(object):
         self.num_filters = num_filters
         self.model_name = 'CartoonGAN'
         self.dataset_name = dasetname
-
-        self.train_flicker_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
-        self.train_cartoon_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB'))
-        self.train_cartoon_smooth_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB_smooth'))
-
-        self.dataset_num = max(len(self.train_flicker_dataset), len(self.train_cartoon_dataset))
         self.conv4_4 = loss_model.get_conv_4_4
-
         self.Generator = self.generator()
         self.Discriminator = self.discriminator()
-        self.data_path = ''
+        self.data_path = '..'
 
     def res_block(self):
         inp = Input(shape=(None, None, self.num_filters * 4))
