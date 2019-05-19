@@ -1,8 +1,9 @@
-.idea/*
-__pycache__/*
+__pycache__/
 .idea/
 Spirited_Away_frames_smooth/
 Spirited_Away_frames/
+*.pyc
 flicker_images/
 Paprika_frames/
+Paprika_frames_smooth/
 Numpy_arrays/
