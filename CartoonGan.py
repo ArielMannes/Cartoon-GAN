@@ -5,7 +5,7 @@ from keras.models import Model
 from keras_contrib.layers.normalization import instancenormalization
 
 from Utils import vgg_loss_model as loss_model
-from Utils.Loss import generator_loss, vgg_loss, discriminator_loss, smooth_gen
+from Utils.Loss import vgg_loss, discriminator_loss, smooth_gen, g_loss
 
 
 class CartoonGAN(object):
@@ -105,8 +105,11 @@ class CartoonGAN(object):
         cartoon_train = np.load('{}/Numpy_arrays/spirited.npy'.format(self.data_path))
         cartoon_smooth = np.load('{}/Numpy_arrays/spirited_smooth.npy'.format(self.data_path))
 
+        train_generator = self.make_train_model()
+        train_generator.compile(optimizer='adam', loss={'model_1': vgg_loss,
+                                                        'disc_loss': lambda r, f: f})
+
         cartoon_smooth_gen = smooth_gen(cartoon_smooth, batch_size)
-        self.Generator.compile(optimizer='adam', loss=generator_loss(self.conv4_4, self.Discriminator))
         self.Discriminator.compile(optimizer='adam', loss=discriminator_loss(cartoon_smooth_gen))
 
         for epoch in range(epochs):
@@ -119,7 +122,9 @@ class CartoonGAN(object):
                 y = np.ones([2 * batch_size, 1])
                 y[batch_size:, :] = 0
                 self.Discriminator.train_on_batch(x, y)
-                self.Generator.train_on_batch(p_batch, p_batch)
+
+                y = self.conv4_4.predict(p_batch)
+                train_generator.train_on_batch(p_batch, y)
 
     def get_pre_train_model(self):
         inp = Input(shape=(None, None, 3))
@@ -128,6 +133,14 @@ class CartoonGAN(object):
         model = Model(inp, loss_out)
         return model
 
+    def make_train_model(self, adv_weight=10):
+        inp = Input(shape=(None, None, 3))
+        orig_out = self.Generator(inp)
+        vgg_loss = self.conv4_4(orig_out)
+        disc_loss = self.Discriminator(orig_out)
+        disc_loss = Lambda(lambda fake: adv_weight * g_loss(fake), name='disc_loss')(disc_loss)
+        model = Model(inp, [vgg_loss, disc_loss])
+        return model
 
 
-CartoonGAN().pre_train()
+CartoonGAN().train_model()

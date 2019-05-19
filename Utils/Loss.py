@@ -16,8 +16,8 @@ def discriminator_loss(real_blur, adv_weight=10):
     return loss
 
 
-def g_loss(fake):
-    return sigmoid_cross_entropy_with_logits(fake, tf.ones_like)
+def g_loss(fake, adv_weight=10):
+    return adv_weight * sigmoid_cross_entropy_with_logits(fake, tf.ones_like)
 
 
 def L1_loss(x, y):
@@ -28,13 +28,6 @@ def L1_loss(x, y):
 
 def vgg_loss(real, fake):
     return L1_loss(real, fake)
-
-
-def generator_loss(conv4_4, disc, adv_weight=10):
-    def loss(real, fake):
-        return vgg_loss(conv4_4)(real, fake) + (adv_weight * g_loss(disc.predict(fake)))
-
-    return loss
 
 
 def smooth_gen(cartoon_smooth, batch_size):
