@@ -4,7 +4,7 @@ from keras.models import Model
 from keras.layers import *
 from keras_contrib.layers.normalization import instancenormalization
 
-from Utils.Loss import sigmoid_cross_entropy_with_logits
+from Utils.Loss import sigmoid_cross_entropy_with_logits, vgg_loss
 
 
 class CartoonGAN(object):
@@ -13,12 +13,16 @@ class CartoonGAN(object):
         self.model_name = 'CartoonGAN'
         self.dataset_name = dasetname
 
-        self.trainA_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
-        self.trainB_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB'))
-        self.trainB_smooth_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB_smooth'))
+        self.train_flicker_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainA'))
+        self.train_cartoon_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB'))
+        self.train_cartoon_smooth_dataset = glob('./dataset/{}/*.*'.format(self.dataset_name + '/trainB_smooth'))
 
-        self.dataset_num = max(len(self.trainA_dataset), len(self.trainB_dataset))
+        self.dataset_num = max(len(self.train_flicker_dataset), len(self.train_cartoon_dataset))
         self.conv4_4 = loss_model.get_conv_4_4
+
+        self.Generator = self.generator()
+        self.Discriminator = self.discriminator()
+        self.colab_path = ''
 
     def res_block(self):
         inp = Input(shape=(None, None, self.num_filters * 4))
@@ -95,5 +99,22 @@ class CartoonGAN(object):
         x = Conv2D(kernel_size=3, filters=1, strides=1, use_bias=False)(x)
 
         return Model(inp, x)
+
+
+
+    def pre_train(self, num_epochs=10):
+        x = np.load('{}/Numpy_arrays/flicker_train.npy'.format(self.colab_path))
+        self.Generator.compile(optimizer='adam', loss=vgg_loss(self.conv4_4))
+        self.Generator.fit(x=x, y=x, epochs=num_epochs)
+
+    def train_model(self, num_epochs=40):
+        flicker_train = np.load('{}/Numpy_arrays/flicker_train.npy'.format(self.colab_path))
+        flicker_test = np.load('{}/Numpy_arrays/flicker_test.npy'.format(self.colab_path))
+        cartoon_train = np.load('{}/Numpy_arrays/spirited_train.npy'.format(self.colab_path))
+        cartoon_test = np.load('{}/Numpy_arrays/spirited_test.npy'.format(self.colab_path))
+        #TODO: compile generator and descriminator with the optimizers
+        self.Generator.compile()
+        #TODO: run with custom loss
+
 
 

@@ -1,8 +1,4 @@
-
-
-.idea/*
-__pycache__/*
-=======
+__pycache__/
 .idea/
 Spirited_Away_frames/
 *.pyc

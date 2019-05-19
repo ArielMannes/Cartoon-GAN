@@ -23,13 +23,15 @@ def L1_loss(x, y):
 
 
 
-def vgg_loss(real, fake, conv4_4):
+def vgg_loss(conv4_4):
 
-    real_features = conv4_4.evaluate(real)
-    fake_features = conv4_4.evaluate(fake)
+    def loss(real, fake):
+        real_features = conv4_4.evaluate(real)
+        fake_features = conv4_4.evaluate(fake)
 
-    return L1_loss(real_features, fake_features)
+        return L1_loss(real_features, fake_features)
+
+    return loss
 
 
-
-vgg_loss(None, None)
+#vgg_loss(None, None)
