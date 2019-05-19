@@ -4,7 +4,7 @@ import cv2
 import numpy as np
 from tqdm import tqdm
 
-path_to_dir = './'
+path_to_dir = '..'
 spirited = 'Spirited_Away_frames'
 siprited_smooth = 'Spirited_Away_frames_smooth'
 flicker = 'flicker_images'
@@ -26,21 +26,29 @@ def make_np_arrays_flicker():
         print('\nsaved. shape:{}'.format(X.shape))
 
 
-def train_test_split(train_percent=0.8):
+def train_test_split(train_percent=0.85):
     global path_to_dir, categories
-    train = np.array([]).reshape((0, 256, 256, 3))
-    test = np.array([]).reshape((0, 256, 256, 3))
-    for cat in tqdm(categories):
+    load_arr = np.load('{}/Numpy_arrays/{}.npy'.format(path_to_dir, categories[0]))
+    train_size = int(len(load_arr) * train_percent)
+    train = load_arr[:train_size]
+    test = load_arr[train_size:]
+
+    for cat in tqdm(categories[1:]):
         load_arr = np.load('{}/Numpy_arrays/{}.npy'.format(path_to_dir, cat))
         train_size = int(len(load_arr) * train_percent)
-        train = np.vstack([train, load_arr[:train_size]])
-        test = np.vstack([test, load_arr[train_size:]])
+        train = np.insert(train, 0, load_arr[:train_size], axis=0)
+        test = np.insert(test, 0, load_arr[train_size:], axis=0)
+        del load_arr
+
     np.random.shuffle(train)
     np.random.shuffle(test)
+
+    print('train: {}\ttest: {}'.format(train.shape, test.shape))
+
     np.save('{}/Numpy_arrays/flicker_train.npy'.format(path_to_dir), train)
-    print('train: {}\nsave flicker_train.npy!'.format(train.shape))
+    print('save flicker_train.npy!'.format(train.shape))
     np.save('{}/Numpy_arrays/flicker_test.npy'.format(path_to_dir), test)
-    print('test: {}\nsave flicker_test.npy!'.format(test.shape))
+    print('save flicker_test.npy!'.format(test.shape))
 
 
 def make_np_array_spirited(_dir, file_name):
@@ -61,3 +69,7 @@ def main():
     train_test_split()
     make_np_array_spirited(spirited, 'spirited')
     make_np_array_spirited(siprited_smooth, 'siprited_smooth')
+
+
+if __name__ == "__main__":
+    main()
