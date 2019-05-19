@@ -26,13 +26,8 @@ def L1_loss(x, y):
     return loss
 
 
-def vgg_loss(conv4_4):
-    def loss(real, fake):
-        real_features = conv4_4.evaluate(real)
-        fake_features = conv4_4.evaluate(fake)
-        return L1_loss(real_features, fake_features)
-
-    return loss
+def vgg_loss(real, fake):
+    return L1_loss(real, fake)
 
 
 def generator_loss(conv4_4, disc, adv_weight=10):
@@ -44,5 +39,5 @@ def generator_loss(conv4_4, disc, adv_weight=10):
 
 def smooth_gen(cartoon_smooth, batch_size):
     while True:
-        for batch in range(ceil(len(cartoon_smooth) / batch_size)):
+        for batch in range(int(ceil(len(cartoon_smooth) / batch_size))):
             yield cartoon_smooth[batch * batch_size: (batch + 1) * batch_size]
