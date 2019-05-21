@@ -141,6 +141,3 @@ class CartoonGAN(object):
         disc_loss = Lambda(lambda fake: adv_weight * g_loss(fake), name='disc_loss')(disc_loss)
         model = Model(inp, [vgg_loss, disc_loss])
         return model
-
-
-CartoonGAN().train_model()
