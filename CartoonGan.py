@@ -93,12 +93,16 @@ class CartoonGAN(object):
 
         return Model(inp, x)
 
-    def pre_train(self, num_epochs=10):
+    def pre_train(self, num_epochs=10, batch_size=32):
         model = self.get_pre_train_model()
         x = np.load('{}/Numpy_arrays/flicker_train.npy'.format(self.data_path))
         model.compile(optimizer='adam', loss=vgg_loss)
-        y = self.conv4_4.predict(x)
-        model.fit(x=x, y=y, epochs=num_epochs)
+        if batch_size != 32:
+            raise NotImplementedError
+        for epoch in range(num_epochs):
+            for batch in range(int(ceil(len(x) / batch_size))):
+                y = np.load('{}/Numpy_arrays/vgg_flicker/train_{}.npy'.format(self.data_path, batch))
+                model.fit(x=x[batch * batch_size: (batch + 1) * batch_size], y=y)
 
     def train_model(self, epochs=40, batch_size=32):
         flicker_train = np.load('{}/Numpy_arrays/flicker_train.npy'.format(self.data_path))
@@ -123,7 +127,7 @@ class CartoonGAN(object):
                 y[batch_size:, :] = 0
                 self.Discriminator.train_on_batch(x, y)
 
-                y = self.conv4_4.predict(p_batch)
+                y = np.load('{}/Numpy_arrays/vgg_flicker/train_{}.npy'.format(self.data_path, batch))
                 train_generator.train_on_batch(p_batch, y)
 
     def get_pre_train_model(self):

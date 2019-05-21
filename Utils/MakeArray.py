@@ -1,8 +1,13 @@
 import glob
+from math import ceil
+from pathlib import Path
+from statistics import mode
 
 import cv2
 import numpy as np
 from tqdm import tqdm
+
+from Utils.vgg_loss_model import get_conv_4_4
 
 path_to_dir = '..'
 spirited = 'Spirited_Away_frames'
@@ -69,6 +74,27 @@ def main():
     train_test_split()
     make_np_array_spirited(spirited, 'spirited')
     make_np_array_spirited(siprited_smooth, 'siprited_smooth')
+    vgg_flicker_predict()
+
+
+def vgg_flicker_predict(batch_size=32):
+    model = get_conv_4_4()
+
+    def help_func(_mode):
+        x = np.load('{}/Numpy_arrays/flicker_{}.npy'.format(path_to_dir, _mode))
+        for batch in tqdm(range(int(ceil(len(x) / batch_size)))):
+            y = model.predict_on_batch(x[batch * batch_size: (batch + 1) * batch_size])
+            np.save('{}/Numpy_arrays/vgg_flicker/{}_{}.npy'.format(path_to_dir, _mode, batch), y)
+        return int(ceil(len(x) / batch_size))
+
+    help_func('train')
+    size = help_func('test')
+
+    # marge test files
+    x = np.empty((0, 32, 32, 512))
+    for i in tqdm(range(size)):
+        x = np.append(x, np.load('{}/Numpy_arrays/vgg_flicker/test_{}.npy'.format(path_to_dir, i)), axis=0)
+    np.save('{}/Numpy_arrays/vgg_test.npy'.format(path_to_dir), x)
 
 
 if __name__ == "__main__":
